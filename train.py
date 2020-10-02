@@ -143,6 +143,8 @@ for label in dirs:
     if not os.path.isdir(os.path.join(TRAINING_BASE, label)):
         continue
     for i, fn in enumerate(os.listdir(os.path.join(TRAINING_BASE, label))):
+        if str(fn) == ".DS_Store":
+            continue
         print(f"start collecting faces from {label}'s data")
         cap = cv2.VideoCapture(os.path.join(TRAINING_BASE, label, fn))
         frame_count = 0
