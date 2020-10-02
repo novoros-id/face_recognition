@@ -3,7 +3,7 @@
 # @Date:   2019-10-22 15:05:15
 # @Last Modified by:   User
 # @Last Modified time: 2019-10-30 22:06:32
-import os
+#import os
 import cv2
 import dlib
 import numpy as np
@@ -119,7 +119,7 @@ def predict(width, height, confidences, boxes, prob_threshold, iou_threshold=0.5
     picked_box_probs[:, 3] *= height
     return picked_box_probs[:, :4].astype(np.int32), np.array(picked_labels), picked_box_probs[:, 4]
 
-onnx_path = 'models/ultra_light/ultra_light_models/ultra_light_640.onnx'
+onnx_path = 'ultra_light_640.onnx'
 onnx_model = onnx.load(onnx_path)
 predictor = prepare(onnx_model)
 ort_session = ort.InferenceSession(onnx_path)
