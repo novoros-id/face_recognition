@@ -38,6 +38,7 @@ while(True):
     if wKew == ord('q'):
         break
     elif wKew == ord('s'):
+        name_file = input()
         numframe = 1
 
 
