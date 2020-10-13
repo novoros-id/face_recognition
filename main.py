@@ -3,6 +3,7 @@
 from flask import Flask, render_template, Response
 from camera import VideoCamera
 app = Flask(__name__)
+#################################
 @app.route('/')
 def index():
     # rendering webpage
@@ -13,6 +14,15 @@ def gen(camera):
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+##################################
+#background process happening without any refreshing
+@app.route('/background_process_test')
+def background_process_test():
+    print ("Hello")
+    return "nothing"
+
+##################################
 @app.route('/video_feed')
 def video_feed():
     return Response(gen(VideoCamera()),
