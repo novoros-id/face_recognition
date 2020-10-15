@@ -10,6 +10,7 @@ from onnx_tf.backend import prepare
 
 tf.compat.v1.disable_eager_execution()
 
+
 def area_of(left_top, right_bottom):
     """
     Compute the areas of rectangles given two corners.
@@ -21,6 +22,7 @@ def area_of(left_top, right_bottom):
     """
     hw = np.clip(right_bottom - left_top, 0.0, None)
     return hw[..., 0] * hw[..., 1]
+
 
 def iou_of(boxes0, boxes1, eps=1e-5):
     """
@@ -39,6 +41,7 @@ def iou_of(boxes0, boxes1, eps=1e-5):
     area0 = area_of(boxes0[..., :2], boxes0[..., 2:])
     area1 = area_of(boxes1[..., :2], boxes1[..., 2:])
     return overlap_area / (area0 + area1 - overlap_area + eps)
+
 
 def hard_nms(box_scores, iou_threshold, top_k=-1, candidate_size=200):
     """
@@ -73,6 +76,7 @@ def hard_nms(box_scores, iou_threshold, top_k=-1, candidate_size=200):
 
     return box_scores[picked, :]
 
+
 def predict(width, height, confidences, boxes, prob_threshold, iou_threshold=0.5, top_k=-1):
     """
     Select boxes that contain human faces
@@ -101,9 +105,9 @@ def predict(width, height, confidences, boxes, prob_threshold, iou_threshold=0.5
         subset_boxes = boxes[mask, :]
         box_probs = np.concatenate([subset_boxes, probs.reshape(-1, 1)], axis=1)
         box_probs = hard_nms(box_probs,
-           iou_threshold=iou_threshold,
-           top_k=top_k,
-           )
+                             iou_threshold=iou_threshold,
+                             top_k=top_k,
+                             )
         picked_box_probs.append(box_probs)
         picked_labels.extend([class_index] * box_probs.shape[0])
     if not picked_box_probs:
@@ -114,6 +118,7 @@ def predict(width, height, confidences, boxes, prob_threshold, iou_threshold=0.5
     picked_box_probs[:, 2] *= width
     picked_box_probs[:, 3] *= height
     return picked_box_probs[:, :4].astype(np.int32), np.array(picked_labels), picked_box_probs[:, 4]
+
 
 # del
 face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
@@ -145,25 +150,6 @@ embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
 phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
 embedding_size = embeddings.get_shape()[1]
 
-# with tf.Graph().as_default():
-#     with tf.Session() as sess:
-#         saver = tf.train.import_meta_graph('models/mfn/m1/mfn.ckpt.meta')
-#         saver.restore(sess, 'models/mfn/m1/mfn.ckpt')
-#
-#         images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
-#         embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
-#         phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
-#         embedding_size = embeddings.get_shape()[1]
-
-
-# with tf.Graph().as_default():
-#     saver = tf.train.import_meta_graph('models/mfn/m1/mfn.ckpt.meta')
-#     saver.restore(tf.Session(), 'models/mfn/m1/mfn.ckpt')
-#
-#     images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
-#     embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
-#     phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
-#     embedding_size = embeddings.get_shape()[1]
 
 class VideoCamera(object):
     def __init__(self):
@@ -174,7 +160,7 @@ class VideoCamera(object):
         sess.close()
 
     def get_frame(self):
-        fps = self.video.get(cv2.CAP_PROP_FPS)
+        #fps = self.video.get(cv2.CAP_PROP_FPS)
         ret, frame = self.video.read()
 
         # preprocess faces
@@ -195,17 +181,17 @@ class VideoCamera(object):
         faces = []
         boxes[boxes < 0] = 0
         for i in range(boxes.shape[0]):
-             box = boxes[i, :]
-             x1, y1, x2, y2 = box
+            box = boxes[i, :]
+            x1, y1, x2, y2 = box
 
-             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-             aligned_face = fa.align(frame, gray, dlib.rectangle(left=x1, top=y1, right=x2, bottom=y2))
-             aligned_face = cv2.resize(aligned_face, (112, 112))
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            aligned_face = fa.align(frame, gray, dlib.rectangle(left=x1, top=y1, right=x2, bottom=y2))
+            aligned_face = cv2.resize(aligned_face, (112, 112))
 
-             aligned_face = aligned_face - 127.5
-             aligned_face = aligned_face * 0.0078125
+            aligned_face = aligned_face - 127.5
+            aligned_face = aligned_face * 0.0078125
 
-             faces.append(aligned_face)
+            faces.append(aligned_face)
 
         # face embedding
         if len(faces) > 0:
@@ -240,13 +226,3 @@ class VideoCamera(object):
 
         ret, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes()
-
-        #success, image = self.video.read()
-        #image = cv2.resize(image, None, fx=ds_factor, fy=ds_factor, interpolation=cv2.INTER_AREA)
-        #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        #face_rects = face_cascade.detectMultiScale(gray, 1.3, 5)
-        #for (x, y, w, h) in face_rects:
-        #    cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        #    break
-        #ret, jpeg = cv2.imencode('.jpg', image)
-        #return jpeg.tobytes()
