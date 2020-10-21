@@ -5,6 +5,7 @@
 # @Last Modified time: 2019-10-30 22:04:25
 import os
 import cv2
+import shutil
 import dlib
 import numpy as np
 from imutils import face_utils
@@ -193,8 +194,21 @@ with tf.Graph().as_default():
         embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
         phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
         feed_dict = {images_placeholder: images, phase_train_placeholder: False}
-        print("========================",images_placeholder)
         embeds = sess.run(embeddings, feed_dict=feed_dict)
+
+        # подготовим файлы
+        # в папке embedings - находится текущий файл, его надо сохранить как prev
+        # потом мы его считаем, и соединим с новыми значениями и перепишем
+
+        shutil.copyfile("embeddings/embeddings.pkl", "embeddings/embeddings_prev.pkl")
+
+        # прочтем предыдущий emb и сложим с новым
+        with open("embeddings/embeddings_prev.pkl", "rb") as f_prev:
+            (saved_embeds_prev, names_prev) = pickle.load(f_prev)
+            embeds = np.vstack((saved_embeds_prev, embeds))
+            names = names_prev + names
+
         with open("embeddings/embeddings.pkl", "wb") as f:
             pickle.dump((embeds, names), f)
+
         print("Done!")
