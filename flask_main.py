@@ -3,16 +3,25 @@
 from flask import Flask, render_template, Response
 from camera_flask import VideoCamera
 
+start_record = 0
 app = Flask(__name__)
 #################################
 @app.route('/')
 def index():
     # rendering webpage
     return render_template('index.html')
+
 def gen(camera):
+    global start_record
     while True:
         #get camera frame
         frame = camera.get_frame()
+
+        if start_record == 1:
+            print("start record", start_record)
+            start_record = 0
+            camera.record_video()
+
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
@@ -20,7 +29,9 @@ def gen(camera):
 #background process happening without any refreshing
 @app.route('/background_process_test')
 def background_process_test():
-    print ("Hello")
+    global start_record
+    print("press test",start_record)
+    start_record = 1
     return "nothing"
 
 ##################################

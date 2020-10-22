@@ -10,7 +10,6 @@ from onnx_tf.backend import prepare
 
 tf.compat.v1.disable_eager_execution()
 
-
 def area_of(left_top, right_bottom):
     """
     Compute the areas of rectangles given two corners.
@@ -22,7 +21,6 @@ def area_of(left_top, right_bottom):
     """
     hw = np.clip(right_bottom - left_top, 0.0, None)
     return hw[..., 0] * hw[..., 1]
-
 
 def iou_of(boxes0, boxes1, eps=1e-5):
     """
@@ -41,7 +39,6 @@ def iou_of(boxes0, boxes1, eps=1e-5):
     area0 = area_of(boxes0[..., :2], boxes0[..., 2:])
     area1 = area_of(boxes1[..., :2], boxes1[..., 2:])
     return overlap_area / (area0 + area1 - overlap_area + eps)
-
 
 def hard_nms(box_scores, iou_threshold, top_k=-1, candidate_size=200):
     """
@@ -75,7 +72,6 @@ def hard_nms(box_scores, iou_threshold, top_k=-1, candidate_size=200):
         indexes = indexes[iou <= iou_threshold]
 
     return box_scores[picked, :]
-
 
 def predict(width, height, confidences, boxes, prob_threshold, iou_threshold=0.5, top_k=-1):
     """
@@ -155,9 +151,28 @@ class VideoCamera(object):
     def __init__(self):
         self.video = cv2.VideoCapture(0)
 
+        # vgn для записи
+        self.fps = int(self.video.get(cv2.CAP_PROP_FPS))
+        self.numframe = 0
+        self.recordFrame = int(self.fps) * 5
+
+        frame_width = int(self.video.get(3))
+        frame_height = int(self.video.get(4))
+
+        self.size = (frame_width, frame_height)
+        self.fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+        # vgn для записи
+
     def __del__(self):
         self.video.release()
         sess.close()
+
+    def record_video(self):
+        # vgn для записи
+        print ("record video in self")
+        self.out = cv2.VideoWriter('faces/tmp/output.mp4', self.fourcc, self.fps, self.size)
+        self.numframe = 1
+        # vgn для записи
 
     def get_frame(self):
         #fps = self.video.get(cv2.CAP_PROP_FPS)
@@ -223,6 +238,18 @@ class VideoCamera(object):
                 cv2.rectangle(frame, (x1, y2 - 20), (x2, y2), (80, 18, 236), cv2.FILLED)
                 font = cv2.FONT_HERSHEY_DUPLEX
                 cv2.putText(frame, text, (x1 + 6, y2 - 6), font, 0.3, (255, 255, 255), 1)
+
+        # vgn
+        if self.numframe != 0 and self.numframe != self.recordFrame:
+            self.numframe += 1
+            # print(numframe)
+            # write the flipped frame
+            self.out.write(frame)
+        elif self.numframe == self.recordFrame:
+            self.numframe = 0
+            print("------ video saved")
+            self.out.release()
+        # vgn
 
         ret, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes()
