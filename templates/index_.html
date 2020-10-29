@@ -4,21 +4,20 @@
   </head>
   <body>
     <h1>Video Streaming Demonstration</h1>
-    <img id="bg" src="{{ url_for('video_feed') }}">
+
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script type=text/javascript>
         $(function() {
           $('a#test').bind('click', function() {
-            $.getJSON('/save_video_button',
+            $.getJSON('/save_video_button?ttrrr',
                 function(data) {
               //do nothing
             });
             return false;
           });
         });
-  </script>
-
+</script>
  <div class='container'>
     <h3>For save video press Save video</h3>
         <form>

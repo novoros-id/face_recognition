@@ -160,7 +160,7 @@ class VideoCamera(object):
         frame_height = int(self.video.get(4))
 
         self.size = (frame_width, frame_height)
-        self.fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+        self.fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
         # vgn для записи
 
     def __del__(self):
@@ -169,7 +169,7 @@ class VideoCamera(object):
 
     def record_video(self):
         # vgn для записи
-        print ("record video in self")
+        print ("start record video")
         self.out = cv2.VideoWriter('faces/tmp/output.mp4', self.fourcc, self.fps, self.size)
         self.numframe = 1
         # vgn для записи
@@ -226,6 +226,19 @@ class VideoCamera(object):
                 else:
                     predictions.append("unknown")
 
+            # vgn saves video
+            if self.numframe != 0 and self.numframe != self.recordFrame:
+                self.numframe += 1
+                # print(numframe)
+                # write the flipped frame
+                self.out.write(frame)
+            elif self.numframe == self.recordFrame:
+                self.numframe = 0
+                print("video saved")
+                self.out.release()
+            # vgn
+
+
             # draw
             for i in range(boxes.shape[0]):
                 box = boxes[i, :]
@@ -239,17 +252,6 @@ class VideoCamera(object):
                 font = cv2.FONT_HERSHEY_DUPLEX
                 cv2.putText(frame, text, (x1 + 6, y2 - 6), font, 0.3, (255, 255, 255), 1)
 
-        # vgn
-        if self.numframe != 0 and self.numframe != self.recordFrame:
-            self.numframe += 1
-            # print(numframe)
-            # write the flipped frame
-            self.out.write(frame)
-        elif self.numframe == self.recordFrame:
-            self.numframe = 0
-            print("------ video saved")
-            self.out.release()
-        # vgn
 
         ret, jpeg = cv2.imencode('.jpg', frame)
         return jpeg.tobytes()

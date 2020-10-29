@@ -153,7 +153,7 @@ with tf.Graph().as_default():
 
             # preprocess faces
             h, w, _ = frame.shape
-            img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            img = cv2.cvtColor(frame, c)
             img = cv2.resize(img, (640, 480))
             img_mean = np.array([127, 127, 127])
             img = (img - img_mean) / 128

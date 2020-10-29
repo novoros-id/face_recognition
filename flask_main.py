@@ -18,7 +18,7 @@ def gen(camera):
         frame = camera.get_frame()
 
         if start_record == 1:
-            print("start record", start_record)
+            #print("start record", start_record)
             start_record = 0
             camera.record_video()
 
@@ -26,11 +26,12 @@ def gen(camera):
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 ##################################
-#background process happening without any refreshing
-@app.route('/background_process_test')
-def background_process_test():
+@app.route('/save_video_button')
+def save_video_button():
     global start_record
-    print("press test",start_record)
+    data = json.loads(request.data)
+    text = data.get("text", None)
+    print("data ----- ", text)
     start_record = 1
     return "nothing"
 
