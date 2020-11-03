@@ -27,21 +27,15 @@ def gen(camera):
     #            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 ##################################
-@app.route('/save_video_button/<uuid>', methods=['GET', 'POST'])
-def save_video_button(uuid):
+@app.route('/save_video_button/<ttt>')
+def save_video_button(ttt):
     global start_record
     #data = json.loads(request.data)
     #text = data.get("text", None)
-    print("data ----- ",uuid)
+    print("data ----- ",ttt)
     start_record = 1
     #return "nothing"
 
-##################################
-# @app.route('/video_feed')
-# def video_feed():
-#     print("video_feed")
-    # return Response(gen(VideoCamera()),
-    #                 mimetype='multipart/x-mixed-replace; boundary=frame')
 if __name__ == '__main__':
     # defining server ip address and port
     app.run(host='0.0.0.0',port='5000', debug=True)
