@@ -2,30 +2,24 @@
   <head>
     <title>Video Streaming Demonstration</title>
   </head>
+
   <body>
     <h1>Video Streaming Demonstration</h1>
     <img id="bg" src="{{ url_for('video_feed') }}">
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type=text/javascript>
-        $(function() {
-          $('a#test').bind('click', function() {
-            $.getJSON('/save_video_button',
-                function(data) {
-              //do nothing
-            });
-            return false;
-          });
-        });
-  </script>
+    <input type="text" id="formValueId" name="valueId"/>
+    <button type="button" class="btn btn-dark" onclick="process(document.getElementById('formValueId').value);">Save video</button>
 
- <div class='container'>
-    <h3>For save video press Save video</h3>
-        <form>
-            <a href=# id=test><button class='btn btn-default'>Save video</button></a>
-        </form>
+    <script type=text/javascript>
+      function process(index) {
+       $.get(`/process_data/${index}`, {}, function (data, status) {
+        //do nothing
+       });
+       }
+    </script>
 
- </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
   </body>
+
 </html>

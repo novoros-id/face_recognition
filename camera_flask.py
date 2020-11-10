@@ -167,10 +167,11 @@ class VideoCamera(object):
         self.video.release()
         sess.close()
 
-    def record_video(self):
+    def record_video(self,name_new_guest):
         # vgn для записи
-        print ("start record video")
-        self.out = cv2.VideoWriter('faces/tmp/output.mp4', self.fourcc, self.fps, self.size)
+        print ("start record video ",name_new_guest)
+        files_name = 'faces/tmp/'+name_new_guest+'.mp4'
+        self.out = cv2.VideoWriter(files_name, self.fourcc, self.fps, self.size)
         self.numframe = 1
         # vgn для записи
 

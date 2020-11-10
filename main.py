@@ -22,6 +22,13 @@ def background_process_test():
     print ("Hello")
     return "nothing"
 
+@app.route('/process_data/<data_>', methods=['GET','POST'])
+def doit(data_):
+    #data = request.get_json(silent=True)
+    #index = data["index"]
+    print ("ptint chto peredali",str(data_))
+    return "23"
+
 ##################################
 @app.route('/video_feed')
 def video_feed():
